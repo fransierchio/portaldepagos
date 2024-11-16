@@ -7,6 +7,7 @@
 using namespace std;
 
 
+enum Menu { TABLERO, OPERACIONES, TRANSACCIONES, PAGOS, PERFIL, CERRAR_SESION };
 
 class Sistema {
 private:
@@ -16,6 +17,7 @@ private:
     char usuario[19];
     char contrasena[19];
     bool oculto;
+    Menu menu;
 
     // Método para limpiar el buffer de teclado
     void limpiarBufferTeclado() {
@@ -96,7 +98,11 @@ private:
 
     void panelUsuario() {
         readimagefile("panelUser.jpg", 0, 0, windowWidth, windowHeight);
+    }
 
+    void operacionesUI()
+    {
+        readimagefile("operaciones.jpg",0,0,1500,750);
     }
 
     void panelAdmin() {
@@ -137,7 +143,6 @@ private:
                     return codigo;
 
                 } else {
-                    outtextxy(870, 605, (char*)"Credenciales incorrectas");
                     delay(1000); 
 
                 }
@@ -145,9 +150,73 @@ private:
 
             delay(10);
         }
-        cout << usuario << " " << contrasena;
     }
 
+    void manejarMenu()
+    {
+         if (ismouseclick(WM_LBUTTONDOWN)) 
+        {
+            getmouseclick(WM_LBUTTONDOWN, x, y);
+
+            //Opcion tablero
+            if (clicEnRectangulo(30, 119, 250, 166, x, y)) {
+                menu= TABLERO;
+            }
+
+           // Opción DEPOSITO 
+            if (clicEnRectangulo(30, 210, 250, 270, x, y)) {
+                menu = OPERACIONES;
+            }
+
+            // Opción TRANSACCIONES
+            if (clicEnRectangulo(30, 290, 265, 350, x, y)) {
+                 menu = TRANSACCIONES;
+            }
+
+            // Opción Servicios 
+            if (clicEnRectangulo(30, 374, 250, 430, x, y)) {
+                menu = PAGOS;
+            }
+
+            // Opción PERFIL
+            if (clicEnRectangulo(30, 450, 250, 495, x, y)) {
+                menu= PERFIL;
+            }
+
+            // Opción CERRAR SESION 
+            if (clicEnRectangulo(330, 670, 250, 730, x, y)) {
+                menu= CERRAR_SESION;
+            }
+        }
+    }
+    
+    void dibujarMenu(int codigo, Menu estado)
+    {
+        if (menu != estado) 
+        {
+            Cliente cliente = Cliente::cargarCliente(codigo);
+            switch (menu) 
+            {
+                case TABLERO:
+                    panelUsuario();
+                    cliente.mostrarCliente();
+                    Cuenta::cargarCuentas(codigo);
+                    break;
+                case OPERACIONES:
+                    operacionesUI();
+                    cliente.mostrarCliente();
+                    break;
+                case TRANSACCIONES:
+                    break;
+                case PAGOS:
+                    break;
+                case PERFIL:
+                    break;
+                case CERRAR_SESION:
+                    break;  
+            }
+        }
+    }
 
 public:
     Sistema(int width, int height) : windowWidth(width), windowHeight(height) {
@@ -170,6 +239,7 @@ public:
         cleardevice();
         if(codigo!=30737409)
         {
+            menu=TABLERO;
             panelUsuario();
             Cliente cliente = Cliente::cargarCliente(codigo);
             cliente.mostrarCliente();
@@ -178,15 +248,15 @@ public:
         {
 
         }
-        while (true) {
-            if (kbhit()) {
-                char tecla = getch();
-                if (tecla == 27) {  
-                    break;  
-                }
-            }
-            delay(10); 
+
+        while(menu!=CERRAR_SESION)
+        {
+            Menu estado = menu;
+            manejarMenu();
+            dibujarMenu(codigo, estado);
+            delay(5);
         }
+        
         closegraph();
     }
 };

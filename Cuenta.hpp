@@ -9,12 +9,11 @@ private:
     string descripcion;
     double saldo;
     int codigoCliente;
-    bool estado;
     string tarjeta;
 
 public:
-    Cuenta(int numeroCuenta, const string& descripcion, double saldo, int codigoCliente, bool estado,const string& tarjeta)
-        : numeroCuenta(numeroCuenta), descripcion(descripcion), saldo(saldo), codigoCliente(codigoCliente), estado(estado), tarjeta(tarjeta) {}
+    Cuenta(int numeroCuenta, const string& descripcion, double saldo, int codigoCliente,const string& tarjeta)
+        : numeroCuenta(numeroCuenta), descripcion(descripcion), saldo(saldo), codigoCliente(codigoCliente), tarjeta(tarjeta) {}
 
     void mostrarCuenta(int movimientoX)  
     {
@@ -73,16 +72,15 @@ public:
             int pos4 = linea.find(';', pos3 + 1);
             int pos5 = linea.find(';', pos4 + 1);
 
-            numCuenta = stoi(linea.substr(0, pos1));
-            descripcion = linea.substr(pos1 + 1, pos2 - pos1 - 1);
-            saldo = stod(linea.substr(pos2 + 1, pos3 - pos2 - 1));
-            codigo = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1));
-            estado = linea.substr(pos4 + 1, pos5 - pos4 - 1) == "1" ? true : false;
-            tarjeta = linea.substr(pos5 + 1);
+            numCuenta = stoi(linea.substr(0, pos1)); 
+            descripcion = linea.substr(pos1 + 1, pos2 - pos1 - 1); 
+            saldo = stod(linea.substr(pos2 + 1, pos3 - pos2 - 1)); 
+            codigo = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1)); 
+            tarjeta = linea.substr(pos4 + 1); 
 
             if (codigo == codigoCliente) 
             {
-                Cuenta cuenta(numCuenta, descripcion, saldo, codigo, estado, tarjeta);
+                Cuenta cuenta(numCuenta, descripcion, saldo, codigo, tarjeta);
                 cuenta.mostrarCuenta(movimientoX);
                 movimientoX+=417;
             }
