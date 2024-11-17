@@ -17,6 +17,8 @@ public:
     // Constructor
     Cliente(int codigoCliente,  const string &nombre, const string &birth,  const string &correo,  const string &telefono, const string &icono)
         : codigoCliente(codigoCliente), nombre(nombre),fechaNacimiento(birth), correo(correo), telefono(telefono), icono(icono) {}
+    Cliente()
+        : codigoCliente(0), nombre(""),fechaNacimiento(""), correo(""), telefono(""), icono("") {}
 
     void mostrarCliente()  
     {

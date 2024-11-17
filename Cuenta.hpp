@@ -14,8 +14,10 @@ private:
 public:
     Cuenta(int numeroCuenta, const string& descripcion, double saldo, int codigoCliente,const string& tarjeta)
         : numeroCuenta(numeroCuenta), descripcion(descripcion), saldo(saldo), codigoCliente(codigoCliente), tarjeta(tarjeta) {}
+    Cuenta() : numeroCuenta(0), descripcion(""), saldo(0.0), codigoCliente(0), tarjeta("") {}
+        
 
-    void mostrarCuenta(int movimientoX)  
+    void mostrarCuenta(int tipo)  
     {
         char strCuenta[100];
         char strTipo[100];
@@ -31,29 +33,36 @@ public:
         setcolor(BLACK);
         settextstyle(8, 0, 2);
 
-        outtextxy(770-movimientoX, 85, strCuenta);
-        outtextxy(770-movimientoX, 60, strTipo);
-        if(movimientoX!=0)
+        if(tipo!=0)
         {
+            outtextxy(363, 85, strCuenta);
+            outtextxy(363, 60, strTipo);
             setbkcolor(COLOR(0x32, 0x32, 0x33));
             setcolor(COLOR(0xf7,0xd2,0x74));
-            outtextxy(780-movimientoX, 132, (char*)"SALDO($):");
-            outtextxy(780-movimientoX, 160, strSaldo);
+            outtextxy(363, 132, (char*)"SALDO($):");
+            outtextxy(363, 160, strSaldo);
             settextstyle(8, 0, 1);
-            outtextxy(820-movimientoX, 200, strTarjeta);
+            outtextxy(403, 200, strTarjeta);
         } else 
         {
+            outtextxy(770, 85, strCuenta);
+            outtextxy(770, 60, strTipo);
             setbkcolor(COLOR(0x5f, 0x17, 0xea));
             setcolor(COLOR(0xf7,0xd2,0x74));
-            outtextxy(780-movimientoX, 132, (char*)"SALDO($):");
-            outtextxy(780-movimientoX, 160, strSaldo);
+            outtextxy(780, 132, (char*)"SALDO($):");
+            outtextxy(780, 160, strSaldo);
             settextstyle(8, 0, 1);
-            outtextxy(817-movimientoX, 200, strTarjeta);
+            outtextxy(817, 200, strTarjeta);
         }
         
     }
 
-    static void cargarCuentas(int codigoCliente) 
+    int seleccionarCuenta()
+    {
+        return numeroCuenta;
+    }
+
+    static void cargarCuentas(int codigoCliente, Cuenta *cuentas) 
     {
         ifstream archivo("cuentas.txt");
         string linea, tarjeta;
@@ -62,7 +71,7 @@ public:
         double saldo;
         bool estado;
 
-        int movimientoX=0;
+        int index = 0;
 
         while (getline(archivo, linea)) 
         {
@@ -78,12 +87,16 @@ public:
             codigo = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1)); 
             tarjeta = linea.substr(pos4 + 1); 
 
-            if (codigo == codigoCliente) 
+            if (codigo == codigoCliente && index < 2) 
             {
-                Cuenta cuenta(numCuenta, descripcion, saldo, codigo, tarjeta);
-                cuenta.mostrarCuenta(movimientoX);
-                movimientoX+=417;
+                cuentas[index]=Cuenta(numCuenta, descripcion, saldo, codigo, tarjeta);
+                index++;
+
             }
         }
-}
+         archivo.close();
+    }
+
+
+
 };

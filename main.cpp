@@ -4,10 +4,11 @@
 #include "Usuario.hpp"
 #include "Cliente.hpp"
 #include "Cuenta.hpp"
+
 using namespace std;
 
 
-enum Menu { TABLERO, OPERACIONES, TRANSACCIONES, PAGOS, PERFIL, CERRAR_SESION };
+enum Menu { TABLERO, TRANSFERENCIAS, DEPOSITOS, RETIROS, TRANSACCIONES, PAGOS, PERFIL, CERRAR_SESION };
 
 class Sistema {
 private:
@@ -18,6 +19,9 @@ private:
     char contrasena[19];
     bool oculto;
     Menu menu;
+    bool enSubmenu; 
+    Cliente cliente;
+    Cuenta cuentas[2];
 
     // Método para limpiar el buffer de teclado
     void limpiarBufferTeclado() {
@@ -100,9 +104,14 @@ private:
         readimagefile("panelUser.jpg", 0, 0, windowWidth, windowHeight);
     }
 
-    void operacionesUI()
+    void transferenciasUI()
     {
         readimagefile("operaciones.jpg",0,0,1500,750);
+    }
+
+    void transaccionesUI()
+    {
+        readimagefile("transacciones.jpg",0,0,1500,750);
     }
 
     void panelAdmin() {
@@ -154,59 +163,109 @@ private:
 
     void manejarMenu()
     {
-         if (ismouseclick(WM_LBUTTONDOWN)) 
-        {
-            getmouseclick(WM_LBUTTONDOWN, x, y);
 
             //Opcion tablero
-            if (clicEnRectangulo(30, 119, 250, 166, x, y)) {
-                menu= TABLERO;
-            }
+            if (clicEnRectangulo(30, 119, 250, 166, x, y)) {menu= TABLERO;}
 
-           // Opción DEPOSITO 
-            if (clicEnRectangulo(30, 210, 250, 270, x, y)) {
-                menu = OPERACIONES;
-            }
+           // Opción Trnasferencias
+            if (clicEnRectangulo(30, 190, 260, 240, x, y)) {menu = TRANSFERENCIAS;}
+
+            // Opción DEPOSITOS
+            if (clicEnRectangulo(30, 245, 265, 300, x, y)) {menu = DEPOSITOS;}
+
+            // Opción retiros
+            if (clicEnRectangulo(30, 325, 250, 374, x, y)) {menu = RETIROS;}
 
             // Opción TRANSACCIONES
-            if (clicEnRectangulo(30, 290, 265, 350, x, y)) {
-                 menu = TRANSACCIONES;
-            }
+            if (clicEnRectangulo(30, 405, 265, 449, x, y)) {menu= TRANSACCIONES;}
 
-            // Opción Servicios 
-            if (clicEnRectangulo(30, 374, 250, 430, x, y)) {
-                menu = PAGOS;
-            }
+            //PAGOS
+            if (clicEnRectangulo(30, 480, 250, 530, x, y)) {menu= PAGOS;}
 
-            // Opción PERFIL
-            if (clicEnRectangulo(30, 450, 250, 495, x, y)) {
-                menu= PERFIL;
-            }
+            //PERFIL
+            if (clicEnRectangulo(30, 480, 250, 530, x, y)) {menu= PERFIL;}
 
             // Opción CERRAR SESION 
-            if (clicEnRectangulo(330, 670, 250, 730, x, y)) {
-                menu= CERRAR_SESION;
+            if (clicEnRectangulo(30, 670, 250, 730, x, y)) {menu= CERRAR_SESION;}
+
+            if (ismouseclick(WM_LBUTTONDOWN)) 
+            {
+                getmouseclick(WM_LBUTTONDOWN, x, y);
             }
-        }
     }
+  
+void manejarClickOperaciones() {
+    int numero;
+    char strNumero[100];
     
-    void dibujarMenu(int codigo, Menu estado)
-    {
-        if (menu != estado) 
+        settextstyle(8,0,5);
+        setcolor(BLACK);
+        setbkcolor(COLOR(0xc5,0xc9,0xe1));
+
+        while(true)
         {
-            Cliente cliente = Cliente::cargarCliente(codigo);
+
+            if (ismouseclick(WM_LBUTTONDOWN)) 
+            {
+                getmouseclick(WM_LBUTTONDOWN, x, y);
+            
+            
+                // Opción corriente
+            if (clicEnRectangulo(615, 60, 680, 113, x, y)) {
+                
+                setfillstyle(SOLID_FILL, WHITE);
+                numero = cuentas[1].seleccionarCuenta();
+                itoa(numero, strNumero, 10);
+                outtextxy(400, 380, strNumero);
+                delay(50); 
+            }
+
+                // Opción Ahorro
+            if (clicEnRectangulo(1043, 63,1098, 113, x, y)) {
+                
+                numero = cuentas[0].seleccionarCuenta();
+                itoa(numero, strNumero, 10);
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(COLOR(0xc5,0xc9,0xe1));
+                outtextxy(400, 380, strNumero);
+                delay(50); 
+            }
+
+            if(clicEnRectangulo(0,0,290,750,x,y)){return;}
+            }
+            delay(100);
+        }
+
+    delay(10);  
+}
+    
+
+    void dibujarMenu(int codigo, Menu &estado)
+    {
+        if (estado!=menu) 
+        {
+            cliente = Cliente::cargarCliente(codigo);
+
+            Cuenta::cargarCuentas(codigo, cuentas);
+            
+
             switch (menu) 
             {
                 case TABLERO:
                     panelUsuario();
                     cliente.mostrarCliente();
-                    Cuenta::cargarCuentas(codigo);
+                    mostrarCuentas();                 
+                    
                     break;
-                case OPERACIONES:
-                    operacionesUI();
-                    cliente.mostrarCliente();
+                case TRANSFERENCIAS:  
+                    transferenciasUI();
+                    mostrarCuentas();
+                    manejarClickOperaciones();
                     break;
                 case TRANSACCIONES:
+                    transaccionesUI();
+                    mostrarCuentas();
                     break;
                 case PAGOS:
                     break;
@@ -215,7 +274,16 @@ private:
                 case CERRAR_SESION:
                     break;  
             }
+            estado = menu;
         }
+    }
+
+    void mostrarCuentas()
+    {
+        for (int i = 0; i < 2; i++) 
+            {
+                cuentas[i].mostrarCuenta(i); 
+            }
     }
 
 public:
@@ -241,9 +309,11 @@ public:
         {
             menu=TABLERO;
             panelUsuario();
-            Cliente cliente = Cliente::cargarCliente(codigo);
+            cliente = Cliente::cargarCliente(codigo);
             cliente.mostrarCliente();
-            Cuenta::cargarCuentas(codigo);
+
+            Cuenta::cargarCuentas(codigo,cuentas);
+            mostrarCuentas();
         }else
         {
 
