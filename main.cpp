@@ -4,6 +4,7 @@
 #include "Usuario.hpp"
 #include "Cliente.hpp"
 #include "Cuenta.hpp"
+#include "Transaccion.hpp"
 
 using namespace std;
 
@@ -22,6 +23,78 @@ private:
     bool enSubmenu; 
     Cliente cliente;
     Cuenta cuentas[2];
+
+int filtrarYConvertirChar(const char* input) {
+    char numeros[100] = "";
+    int j = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (isdigit(input[i])) { 
+            numeros[j++] = input[i];
+        }
+    }
+
+    numeros[j] = '\0'; 
+
+    if (strlen(numeros) > 0) {
+        return atoi(numeros); 
+    } else {
+        return 0; 
+    }
+}
+
+double convertirMontoValido(const char* monto) {
+    string montoLimpiado = "";
+    bool puntoDecimalEncontrado = false;
+
+    for (int i = 0; monto[i] != '\0'; i++) {
+        if (isdigit(monto[i])) {
+            montoLimpiado += monto[i]; 
+        } else if (monto[i] == '.' || monto[i] == ',') {
+            if (!puntoDecimalEncontrado) {
+                montoLimpiado += '.';  // Reemplazar la coma por punto, PARA EVITAR ERRORES
+                puntoDecimalEncontrado = true; 
+            } else {
+                cout << "Monto inválido. Solo se permite un punto decimal." << endl;
+                return 0.0;  // Si ya se encontró un punto, es inválido
+            }
+        } else {
+            cout << "Monto no valido" << endl;
+            return 0.0;  // Si contiene letras y simbolos, es inválido
+        }
+    }
+
+    double montoFinal = atof(montoLimpiado.c_str());
+
+    if (montoFinal <= 0) {
+        cout << "Monto inválido. El monto debe ser mayor que cero." << endl;
+        return 0.0;  // Retorna 0.0 si el monto no es válido
+    }
+
+    return montoFinal;
+}
+
+void limpiarChar(char* arr, int size) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = '\0';
+    }
+}
+
+void limpiarReceptor() {
+    setfillstyle(SOLID_FILL, COLOR(0x33, 0x33, 0x33));
+    // Limpiar el área del nombre
+    bar(1170, 290, 1457, 330);
+    // Limpiar el área del teléfono
+    bar(1170, 480, 1452, 520);
+    // Limpiar el área del correo 
+    bar(1170, 380, 1457, 423);
+    // Limpiar el área del icono
+    bar(1214, 66, 1397, 220);
+    setbkcolor(COLOR(0x33, 0x33, 0x33));  
+    setcolor(WHITE);
+    settextstyle(8, 0, 1);
+    outtextxy(1170,290, (char*)"USUARIO NO ENCONTRADO");
+}
 
     // Método para limpiar el buffer de teclado
     void limpiarBufferTeclado() {
@@ -147,12 +220,14 @@ private:
                 int codigo=0;
                 if (Usuario::verificarLogin(usuario, contrasena, codigo)) {
                     setfillstyle(SOLID_FILL, WHITE);
-                    bar(870, 605 - 16, 870 + 500, 640);
+                    bar(870, 605 - 16, 870 + 800, 640);
                     cleardevice();
                     return codigo;
 
                 } else {
                     delay(1000); 
+                    setfillstyle(SOLID_FILL, WHITE);
+                    bar(870, 605 - 16, 870 + 600, 640);
 
                 }
             }
@@ -194,27 +269,41 @@ private:
             }
     }
   
-void manejarClickOperaciones() {
-    int numero;
+    bool manejarClickOperaciones() {
+    int numero=0;
+    int receptorIndex=0,montoIndex=0, numReceptor=0, indexCuenta=-1;
+    char receptor[19];
+    char monto[19];
+    int codigoReceptor;
     char strNumero[100];
+    double montoTransferir=0;
+    Cliente Recep;
+    Cuenta RECEPCION;
+    Cuenta EMISOR;;
+    
     
         settextstyle(8,0,5);
         setcolor(BLACK);
-        setbkcolor(COLOR(0xc5,0xc9,0xe1));
+        setbkcolor(WHITE);
 
         while(true)
         {
-
             if (ismouseclick(WM_LBUTTONDOWN)) 
             {
+                limpiarBufferTeclado();
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-            
+                cout<<"X="<<x<<" Y="<<y;
             
                 // Opción corriente
             if (clicEnRectangulo(615, 60, 680, 113, x, y)) {
                 
                 setfillstyle(SOLID_FILL, WHITE);
-                numero = cuentas[1].seleccionarCuenta();
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(WHITE);
+                numero = cuentas[1].getNumeroCuenta();
+                EMISOR = cuentas[1];
+                indexCuenta=1;
                 itoa(numero, strNumero, 10);
                 outtextxy(400, 380, strNumero);
                 delay(50); 
@@ -222,17 +311,80 @@ void manejarClickOperaciones() {
 
                 // Opción Ahorro
             if (clicEnRectangulo(1043, 63,1098, 113, x, y)) {
-                
-                numero = cuentas[0].seleccionarCuenta();
+                numero = cuentas[0].getNumeroCuenta();
+                EMISOR = cuentas[0];
                 itoa(numero, strNumero, 10);
                 settextstyle(8,0,5);
                 setcolor(BLACK);
-                setbkcolor(COLOR(0xc5,0xc9,0xe1));
+                setbkcolor(WHITE);
                 outtextxy(400, 380, strNumero);
                 delay(50); 
             }
 
-            if(clicEnRectangulo(0,0,290,750,x,y)){return;}
+            //receptor
+            if(clicEnRectangulo(398, 521,1003, 596, x, y))
+            {
+                escribirEnCampo(370, 521,1003, 596, receptor, 10, receptorIndex,0);
+                numReceptor = filtrarYConvertirChar(receptor);
+                codigoReceptor=Cuenta::buscarCodigo(numReceptor);
+                if(codigoReceptor!=0)
+                {
+                    RECEPCION = Cuenta::cargarCuenta(codigoReceptor, numReceptor);
+                    setfillstyle(SOLID_FILL, COLOR(0x33, 0x33, 0x33));
+                    bar(1170, 290, 1457, 330);
+                    Recep = Cliente::cargarCliente(codigoReceptor);
+                    Recep.mostrarReceptor();
+                } else 
+                { 
+                    limpiarReceptor();
+                }
+            }
+            //monto
+            if(clicEnRectangulo(1101, 616,1455, 690, x, y))
+            {
+                escribirEnCampo(1070, 616,1455, 690, monto, 10, montoIndex,0);
+                montoTransferir = convertirMontoValido(monto);
+                if(montoTransferir==0.0)
+                {
+                    settextstyle(8,0,1);
+                    setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+                    outtextxy(1222,570,(char*)"Monto  Invalido");
+                    delay(1000);
+                    setfillstyle(SOLID_FILL, COLOR(0xf9, 0xfa, 0xfb));
+                    bar(1207, 569, 1460, 596);
+                }
+                
+            }
+            //enviar pago
+            if(clicEnRectangulo(525, 674,846, 731, x, y))
+            {
+                bool exitoso;
+                if(montoTransferir!=0.0)
+                {
+                    exitoso=Transaccion::validarTransferencia(&EMISOR, &RECEPCION, montoTransferir, numero,numReceptor );
+                    if(exitoso)
+                    {
+                        int codigoTransaccion = Transaccion::generarCodigoTransaccion();
+                        Transaccion::registrarTransaccion(codigoTransaccion, "Transferencia", montoTransferir, EMISOR.getNumeroCuenta(), RECEPCION.getNumeroCuenta());
+                        Transaccion::actualizarCuentas(EMISOR.getNumeroCuenta(), RECEPCION.getNumeroCuenta(), montoTransferir);
+                        //VUELVE LOS DATOS POR DEFECTO
+                        settextstyle(8,0,1);
+                        outtextxy(376,644,(char*)"Transaccion Exitosa");
+                        delay(1000);
+                        menu=TABLERO;
+                        return 1;
+                    } else 
+                    {
+                        limpiarChar(monto,19);
+                        setfillstyle(SOLID_FILL, WHITE);
+                        bar(1114, 629, 1454, 690);
+                        montoIndex=0;
+                        montoTransferir=0;
+                    }
+                }
+            }
+
+            if(clicEnRectangulo(0,0,290,750,x,y)){return 0;}
             }
             delay(100);
         }
@@ -240,9 +392,9 @@ void manejarClickOperaciones() {
     delay(10);  
 }
     
-
     void dibujarMenu(int codigo, Menu &estado)
     {
+        bool volver=false;
         if (estado!=menu) 
         {
             cliente = Cliente::cargarCliente(codigo);
@@ -255,17 +407,25 @@ void manejarClickOperaciones() {
                 case TABLERO:
                     panelUsuario();
                     cliente.mostrarCliente();
-                    mostrarCuentas();                 
-                    
+                    mostrarCuentas();
+                             
                     break;
                 case TRANSFERENCIAS:  
                     transferenciasUI();
                     mostrarCuentas();
-                    manejarClickOperaciones();
+                    volver=manejarClickOperaciones();
+                    if(volver)
+                    {
+                    Cuenta::cargarCuentas(codigo, cuentas);
+                    panelUsuario(); 
+                    cliente.mostrarCliente();
+                    mostrarCuentas();
+                    }
                     break;
                 case TRANSACCIONES:
                     transaccionesUI();
                     mostrarCuentas();
+                     
                     break;
                 case PAGOS:
                     break;
@@ -314,9 +474,6 @@ public:
 
             Cuenta::cargarCuentas(codigo,cuentas);
             mostrarCuentas();
-        }else
-        {
-
         }
 
         while(menu!=CERRAR_SESION)

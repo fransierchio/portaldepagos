@@ -20,6 +20,11 @@ public:
     Cliente()
         : codigoCliente(0), nombre(""),fechaNacimiento(""), correo(""), telefono(""), icono("") {}
 
+    void setDefault()
+        {
+            codigoCliente=0, nombre="",fechaNacimiento="", correo="", telefono="", icono="";
+        }
+
     void mostrarCliente()  
     {
         setbkcolor(COLOR(0x33, 0x33, 0x33));  
@@ -48,6 +53,36 @@ public:
         settextstyle(8, 0, 2);  
         //dividir el correo porque puede ser muy grande
         int xCorreo = 1170, yCorreo = 568; 
+        for (int i = 0; i < strlen(strCorreo); i += 17) 
+        {
+            char subCorreo[18]; 
+            strncpy(subCorreo, &strCorreo[i], 17);
+            subCorreo[17] = '\0';
+            outtextxy(xCorreo, yCorreo, subCorreo);
+            yCorreo += 20; 
+        }
+    }
+
+    void mostrarReceptor()  
+    {
+        setbkcolor(COLOR(0x33, 0x33, 0x33));  
+        setcolor(WHITE);
+        settextstyle(8, 0, 3);
+
+        char strNombre[100];
+        char strCorreo[100];
+        char strTelefono[100];
+        char strIcono[100];
+        strcpy(strNombre, nombre.c_str());  
+        strcpy(strCorreo, correo.c_str());  
+        strcpy(strTelefono, telefono.c_str());  
+        strcpy(strIcono, icono.c_str()); 
+
+        readimagefile(strIcono, 1214, 66, 1390, 217);
+        outtextxy(1170, 290, strNombre);
+        outtextxy(1170, 480, strTelefono);
+
+        int xCorreo = 1170, yCorreo = 380; 
         for (int i = 0; i < strlen(strCorreo); i += 17) 
         {
             char subCorreo[18]; 
