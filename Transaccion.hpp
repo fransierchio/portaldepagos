@@ -128,6 +128,73 @@ public:
     rename("temp.txt", "cuentas.txt");
 }
 
+static bool depositar(Cuenta* cuentaReceptor, double monto) {
+    if (!cuentaReceptor) {
+        setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+        settextstyle(8, 0, 1);
+        outtextxy(376, 644, (char*)"Error: La cuenta no está seleccionada.");
+        delay(1000);
+        return false;
+    }
+
+    if (monto <= 0) {
+        setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+        settextstyle(8, 0, 1);
+        outtextxy(376, 644, (char*)"Error: El monto debe ser mayor que cero.");
+        delay(1000);
+        return false;
+    }
+
+    int numeroCuentaReceptor = cuentaReceptor->getNumeroCuenta();
+    actualizarCuentas(0, numeroCuentaReceptor, monto); 
+
+    int codigoTransaccion = generarCodigoTransaccion();
+    registrarTransaccion(codigoTransaccion, "Deposito", monto, 0, numeroCuentaReceptor);
+
+    settextstyle(8, 0, 1);
+    outtextxy(376, 644, (char*)"Deposito exitoso.");
+    delay(1000);
+
+    return true;
+}
+
+static bool retirar(Cuenta* cuentaOrigen, double monto) {
+    if (!cuentaOrigen) {
+        setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+        settextstyle(8, 0, 1);
+        outtextxy(376, 644, (char*)"Error: La cuenta no está seleccionada.");
+        delay(1000);
+        return false;
+    }
+
+    if (monto <= 0) {
+        setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+        settextstyle(8, 0, 1);
+        outtextxy(376, 644, (char*)"Error: El monto debe ser mayor que cero.");
+        delay(1000);
+        return false;
+    }
+
+    if (cuentaOrigen->getBalance() < monto) {
+        setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+        settextstyle(8, 0, 1);
+        outtextxy(376, 644, (char*)"Error: Fondos insuficientes.");
+        delay(1000);
+        return false;
+    }
+
+    int numeroCuentaOrigen = cuentaOrigen->getNumeroCuenta();
+    actualizarCuentas(numeroCuentaOrigen, 0, monto); 
+
+    int codigoTransaccion = generarCodigoTransaccion();
+    registrarTransaccion(codigoTransaccion, "Retiro", monto, numeroCuentaOrigen, 0);
+
+    settextstyle(8, 0, 1);
+    outtextxy(376, 644, (char*)"Retiro exitoso.");
+    delay(1000);
+
+    return true;
+}
 
 };
 

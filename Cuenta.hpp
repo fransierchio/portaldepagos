@@ -65,6 +65,7 @@ public:
     int getNumeroCuenta() { return numeroCuenta; }
     double getBalance() { return saldo; }
     int getCodigo(){return codigoCliente;}
+    string getTrajeta(){return tarjeta;}
 
     static void cargarCuentas(int codigoCliente, Cuenta *cuentas) 
     {
@@ -178,13 +179,42 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
         return;
     }
 
+    int totalTransacciones = 0;
+
+    // Primera pasada: contar la cantidad de transaciones
     string linea;
+    while (getline(archivo, linea)) {
+        int pos3 = linea.find(';', linea.find(';', linea.find(';') + 1) + 1);
+        int pos4 = linea.find(';', pos3 + 1);
+
+        int cuentaOrigen = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1));
+        int cuentaDestino = stoi(linea.substr(pos4 + 1));
+
+        if (cuentaOrigen == cuenta1 || cuentaOrigen == cuenta2 || 
+            cuentaDestino == cuenta1 || cuentaDestino == cuenta2) {
+            totalTransacciones++;
+        }
+    }
+
+    archivo.clear();            
+    archivo.seekg(0, ios::beg);     // Volver al inicio del archivo
+
+    int inicio = max(0, totalTransacciones - 7);
+    int actual = 0;
+
+    int x = 373;   
+    int y = 439;    
+    int offsetY = 40;
+    int yimg=0;
+
+
+    // Segunda pasada: mostrar solo las ultims 7 transacciones
     while (getline(archivo, linea)) {
         int pos1 = linea.find(';');
         int pos2 = linea.find(';', pos1 + 1);
         int pos3 = linea.find(';', pos2 + 1);
         int pos4 = linea.find(';', pos3 + 1);
-        int pos5 = linea.find(';', pos4 + 1);  // Buscar tarjeta si existe
+        int pos5 = linea.find(';', pos4 + 1);
 
         int codigoTransaccion = stoi(linea.substr(0, pos1));
         string descripcion = linea.substr(pos1 + 1, pos2 - pos1 - 1);
@@ -192,38 +222,80 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
         int cuentaOrigen = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1));
         int cuentaDestino = stoi(linea.substr(pos4 + 1, pos5 - pos4 - 1));
 
-        string tarjeta = "";
-        if (pos5 != string::npos) {
-            tarjeta = linea.substr(pos5 + 1);  // Si existe tarjeta, la obtenemos
-        }
+        string tarjeta = (pos5 != string::npos) ? linea.substr(pos5 + 1) : "";
 
-        // Verificar si la transacción es para las cuentas que nos interesan
         if (cuentaOrigen == cuenta1 || cuentaOrigen == cuenta2 || 
             cuentaDestino == cuenta1 || cuentaDestino == cuenta2) {
-            
-            // Mostrar la transacción según la descripción
-            cout << "ID: " << codigoTransaccion
-                 << " | Descripción: " << descripcion
-                 << " | Monto: " << monto
-                 << " | Origen: " << cuentaOrigen
-                 << " | Destino: " << cuentaDestino;
+            if (actual >= inicio) {
+                char strID[50], strMonto[50], strCuentas[100], strTarjeta[100];
+                itoa(codigoTransaccion, strID, 10);
+                gcvt(monto, 10, strMonto);
+                int lenMonto = strlen(strMonto);
+                if (lenMonto > 0 && strMonto[lenMonto - 1] == '.') {
+                    strMonto[lenMonto - 1] = '\0'; 
+                }
 
-            if (!tarjeta.empty()) {
-                cout << " | Tarjeta: " << tarjeta;
-            }
+                if(cuentaOrigen==0)
+                {
+                    sprintf(strCuentas, " %s        %d ", "EFECTIVO", cuentaDestino);
+                } else if (cuentaDestino==0)
+                {
+                    sprintf(strCuentas, " %d          %s ", cuentaOrigen, "EFECTIVO");
+                } else {sprintf(strCuentas, " %d          %d ", cuentaOrigen, cuentaDestino);}
+                
+                
+                if (!tarjeta.empty()) {
+                    strcpy(strTarjeta, tarjeta.c_str());
+                } else {
+                    strcpy(strTarjeta, ""); // Si no hay tarjeta, vacío
+                }
 
-            // Asociar archivo de imagen si la transacción es una transferencia
-            if (descripcion == "Transferencia") {
-                cout << " | Imagen: transferencia.jpg" << endl;
+                // Dibujar transacción con coordenadas
+                setbkcolor(WHITE);
+                setcolor(BLACK);
+                settextstyle(8, 0, 1);
+
+                // Mostrar ID
+                outtextxy(x + 87, y, strID);
+
+                // Mostrar descripción
+                if(descripcion=="Transferencia")
+                {
+                    readimagefile("Tranferencias.jpg", 360, 430+yimg, 420, 470+yimg);
+                }
+                if(descripcion=="Deposito")
+                {
+                    readimagefile("Depositos.jpg", 360, 430+yimg, 420, 470+yimg);
+                }
+                if(descripcion=="Retiro")
+                {
+                    readimagefile("Retiros.jpg", 360, 430+yimg, 420, 470+yimg);
+                }
+
+
+                // Mostrar monto
+                outtextxy(x + 591, y, strMonto);
+
+                // Mostrar cuentas
+                setcolor(BLACK);
+                outtextxy(x+260, y, strCuentas);
+
+                // Mostrar tarjeta si existe
+                if (strlen(strTarjeta) > 0) {
+                    settextstyle(8, 0, 1);
+                    outtextxy(x, y, strTarjeta);
+                }
+
+                // Incrementar Y para la siguiente transacción
+                y += offsetY;
+                yimg += offsetY;
             }
-            else {
-                cout << endl;
-            }
+            actual++;
         }
     }
 
     archivo.close();
 }
-    
+
 
 };

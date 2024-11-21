@@ -9,7 +9,7 @@
 using namespace std;
 
 
-enum Menu { TABLERO, TRANSFERENCIAS, DEPOSITOS, RETIROS, TRANSACCIONES, PAGOS, PERFIL, CERRAR_SESION };
+enum Menu { TABLERO, TRANSFERENCIAS, DEPOSITOS, RETIROS, PERFIL, CERRAR_SESION };
 
 class Sistema {
 private:
@@ -182,9 +182,19 @@ void limpiarReceptor() {
         readimagefile("operaciones.jpg",0,0,1500,750);
     }
 
-    void transaccionesUI()
+    void depositosUI()
+        {
+            readimagefile("depositoUI.jpg",0,0,1500,750);
+        }
+
+    void retirosUI()
+        {
+            readimagefile("RetirosUI.jpg",0,0,1500,750);
+        }
+
+    void perfilUI()
     {
-        readimagefile("transacciones.jpg",0,0,1500,750);
+        readimagefile("Perfil.jpg",0,0,1500,750);
     }
 
     void panelAdmin() {
@@ -246,19 +256,13 @@ void limpiarReceptor() {
             if (clicEnRectangulo(30, 190, 260, 240, x, y)) {menu = TRANSFERENCIAS;}
 
             // Opción DEPOSITOS
-            if (clicEnRectangulo(30, 245, 265, 300, x, y)) {menu = DEPOSITOS;}
+            if (clicEnRectangulo(30, 256, 265, 304, x, y)) {menu = DEPOSITOS;}
 
             // Opción retiros
             if (clicEnRectangulo(30, 325, 250, 374, x, y)) {menu = RETIROS;}
 
-            // Opción TRANSACCIONES
-            if (clicEnRectangulo(30, 405, 265, 449, x, y)) {menu= TRANSACCIONES;}
-
-            //PAGOS
-            if (clicEnRectangulo(30, 480, 250, 530, x, y)) {menu= PAGOS;}
-
             //PERFIL
-            if (clicEnRectangulo(30, 480, 250, 530, x, y)) {menu= PERFIL;}
+            if (clicEnRectangulo(30, 400, 250, 450, x, y)) {menu= PERFIL;}
 
             // Opción CERRAR SESION 
             if (clicEnRectangulo(30, 670, 250, 730, x, y)) {menu= CERRAR_SESION;}
@@ -266,6 +270,7 @@ void limpiarReceptor() {
             if (ismouseclick(WM_LBUTTONDOWN)) 
             {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
+                cout<<"X="<<x<<" Y="<<y;
             }
     }
   
@@ -292,7 +297,7 @@ void limpiarReceptor() {
             {
                 limpiarBufferTeclado();
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X="<<x<<" Y="<<y;
+                
             
                 // Opción corriente
             if (clicEnRectangulo(615, 60, 680, 113, x, y)) {
@@ -392,6 +397,246 @@ void limpiarReceptor() {
     delay(10);  
 }
     
+    bool manejarClickDepositos() {  
+    int numero=0;
+    int montoIndex=0, indexCuenta=-1;
+    char monto[19];
+    char strNumero[100];
+    double montoTransferir=0;
+    Cuenta RECEPCION;
+    
+    
+    
+        settextstyle(8,0,5);
+        setcolor(BLACK);
+        setbkcolor(WHITE);
+
+        while(true)
+        {
+            
+            if (ismouseclick(WM_LBUTTONDOWN)) 
+            {
+                limpiarBufferTeclado();
+                getmouseclick(WM_LBUTTONDOWN, x, y);
+                cout<<"X="<<x<<" Y="<<y;
+                
+            
+                // depostitar corriente
+            if (clicEnRectangulo(615, 60, 680, 113, x, y)) {
+                
+                setfillstyle(SOLID_FILL, WHITE);
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(WHITE);
+                numero = cuentas[1].getNumeroCuenta();
+                RECEPCION = cuentas[1];
+                indexCuenta=1;
+                itoa(numero, strNumero, 10);
+                outtextxy(400, 550, strNumero);
+                delay(50); 
+            }
+
+                // depositar Ahorro
+            if (clicEnRectangulo(1043, 63,1098, 113, x, y)) {
+                numero = cuentas[0].getNumeroCuenta();
+                RECEPCION = cuentas[0];
+                itoa(numero, strNumero, 10);
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(WHITE);
+                outtextxy(400, 550, strNumero);
+                delay(50); 
+            }
+
+            //monto
+            if(clicEnRectangulo(380, 383,741, 444, x, y))
+            {
+                escribirEnCampo(380, 383,741, 444, monto, 10, montoIndex,0);
+                montoTransferir = convertirMontoValido(monto);
+                if(montoTransferir==0.0)
+                {
+                    settextstyle(8,0,1);
+                    setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+                    outtextxy(785,415,(char*)"Monto  Invalido");
+                    delay(1000);
+                    setfillstyle(SOLID_FILL, COLOR(0xf9, 0xfa, 0xfb));
+                    bar(780, 378, 1200, 450);
+                }
+                
+            }
+            //enviar pago
+            if(clicEnRectangulo(525, 674,846, 731, x, y))
+            {
+                bool exitoso;
+                if(montoTransferir!=0.0)
+                {
+                    exitoso=Transaccion::depositar(&RECEPCION, montoTransferir);
+                    if(exitoso)
+                    {
+                        limpiarChar(monto,19);
+                        montoIndex=0;
+                        montoTransferir=0;
+                        menu=TABLERO;
+                        return 1;
+                    } else 
+                    {
+                        limpiarChar(monto,19);
+                        setfillstyle(SOLID_FILL, WHITE);
+                        bar(390, 383,741, 444);
+                        montoIndex=0;
+                        montoTransferir=0;
+                    }
+                }
+            }
+
+            if(clicEnRectangulo(0,0,290,750,x,y)){return 0;}
+            }
+            delay(100);
+        }
+
+    delay(10);  
+}
+
+ bool manejarClickRetiros() {
+    string tarjeta="";
+    int montoIndex=0, indexCuenta=-1;
+    char monto[19];
+    char strTarjeta[100];
+    double montoTransferir=0;
+    Cuenta ORIGEN;
+    
+        settextstyle(8,0,5);
+        setcolor(BLACK);
+        setbkcolor(WHITE);
+
+        while(true)
+        {
+            
+            if (ismouseclick(WM_LBUTTONDOWN)) 
+            {
+                limpiarBufferTeclado();
+                getmouseclick(WM_LBUTTONDOWN, x, y);
+                cout<<"X="<<x<<" Y="<<y;
+                
+            
+                // Retirar corriente
+            if (clicEnRectangulo(615, 60, 680, 113, x, y)) {
+                
+                setfillstyle(SOLID_FILL, WHITE);
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(WHITE);
+                tarjeta = cuentas[1].getTrajeta();
+                ORIGEN = cuentas[1];
+                indexCuenta=1;
+                strcpy(strTarjeta,tarjeta.c_str());
+                outtextxy(400, 406, strTarjeta);
+                delay(50); 
+            }
+
+                // Retirar Ahorro
+            if (clicEnRectangulo(1043, 63,1098, 113, x, y)) {
+                tarjeta = cuentas[0].getTrajeta();
+                ORIGEN = cuentas[0];
+                strcpy(strTarjeta,tarjeta.c_str());
+                settextstyle(8,0,5);
+                setcolor(BLACK);
+                setbkcolor(WHITE);
+                outtextxy(400, 406, strTarjeta);
+                delay(50); 
+            }
+
+            //monto
+            if(clicEnRectangulo(402, 530,734, 584, x, y))
+            {
+                escribirEnCampo(402, 530,734, 584, monto, 10, montoIndex,0);
+                montoTransferir = convertirMontoValido(monto);
+                if(montoTransferir==0.0)
+                {
+                    settextstyle(8,0,1);
+                    setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
+                    outtextxy(785,565,(char*)"Monto  Invalido");
+                    delay(1000);
+                    setfillstyle(SOLID_FILL, COLOR(0xf9, 0xfa, 0xfb));
+                    bar(775, 517, 1035, 584);
+                }
+                
+            }
+            //Retirar
+            if(clicEnRectangulo(525, 674,846, 731, x, y))
+            {
+                bool exitoso;
+                if(montoTransferir>0.0)
+                {
+                    exitoso=Transaccion::retirar(&ORIGEN, montoTransferir);
+                    if(exitoso)
+                    {
+                        limpiarChar(monto,19);
+                        montoIndex=0;
+                        montoTransferir=0;
+                        menu=TABLERO;
+                        return 1;
+                    } else 
+                    {
+                        limpiarChar(monto,19);
+                        setfillstyle(SOLID_FILL, WHITE);
+                        bar(775, 517, 1035, 584);
+                        montoIndex=0;
+                        montoTransferir=0;
+                    }
+                }
+            }
+
+            if(clicEnRectangulo(0,0,290,750,x,y)){return 0;}
+            }
+            delay(100);
+        }
+
+    delay(10);  
+}
+
+bool manejarClickPerfil() {
+    int NombreIndex=0, usuarioIndex=0;
+    char Nombre[19];
+    char Usuario[19];
+    Cuenta ORIGEN;
+    
+        settextstyle(8,0,5);
+        setcolor(BLACK);
+        setbkcolor(WHITE);
+
+        while(true)
+        {
+            
+            if (ismouseclick(WM_LBUTTONDOWN)) 
+            {
+                limpiarBufferTeclado();
+                getmouseclick(WM_LBUTTONDOWN, x, y);
+                cout<<"X="<<x<<" Y="<<y;
+                
+
+            //Nombre
+            if(clicEnRectangulo(363, 66,948, 125, x, y))
+            {
+                escribirEnCampo(363, 66,948, 125, Nombre, 10, NombreIndex,0);
+                
+            }
+
+            //Usuario
+            if(clicEnRectangulo(363, 205,948, 272, x, y))
+            {
+                escribirEnCampo(363, 205,948, 272, Usuario, 10, usuarioIndex,0);
+                
+            }
+
+            if(clicEnRectangulo(0,0,290,750,x,y)){return 0;}
+            }
+            delay(100);
+        }
+
+    delay(10);  
+}
+
     void dibujarMenu(int codigo, Menu &estado)
     {
         bool volver=false;
@@ -408,7 +653,7 @@ void limpiarReceptor() {
                     panelUsuario();
                     cliente.mostrarCliente();
                     mostrarCuentas();
-                             
+                    cuentas->mostrarTransacciones(cuentas[0].getNumeroCuenta(),cuentas[1].getNumeroCuenta());   
                     break;
                 case TRANSFERENCIAS:  
                     transferenciasUI();
@@ -420,16 +665,40 @@ void limpiarReceptor() {
                     panelUsuario(); 
                     cliente.mostrarCliente();
                     mostrarCuentas();
+                    cuentas->mostrarTransacciones(cuentas[0].getNumeroCuenta(),cuentas[1].getNumeroCuenta());
                     }
                     break;
-                case TRANSACCIONES:
-                    transaccionesUI();
+                case DEPOSITOS: 
+                depositosUI();
+                mostrarCuentas();
+                volver=manejarClickDepositos();
+                if(volver)
+                    {
+                    Cuenta::cargarCuentas(codigo, cuentas);
+                    panelUsuario(); 
+                    cliente.mostrarCliente();
                     mostrarCuentas();
-                     
-                    break;
-                case PAGOS:
-                    break;
+                    cuentas->mostrarTransacciones(cuentas[0].getNumeroCuenta(),cuentas[1].getNumeroCuenta());
+                    }
+                break;
+
+                case RETIROS:
+                retirosUI();
+                mostrarCuentas();
+                volver=manejarClickRetiros();
+                if(volver)
+                    {
+                    Cuenta::cargarCuentas(codigo, cuentas);
+                    panelUsuario(); 
+                    cliente.mostrarCliente();
+                    mostrarCuentas();
+                    cuentas->mostrarTransacciones(cuentas[0].getNumeroCuenta(),cuentas[1].getNumeroCuenta());
+                    }
+                break;
+                    
                 case PERFIL:
+                    perfilUI();
+                    manejarClickPerfil();
                     break;
                 case CERRAR_SESION:
                     break;  
@@ -471,9 +740,9 @@ public:
             panelUsuario();
             cliente = Cliente::cargarCliente(codigo);
             cliente.mostrarCliente();
-
             Cuenta::cargarCuentas(codigo,cuentas);
             mostrarCuentas();
+            cuentas->mostrarTransacciones(cuentas[0].getNumeroCuenta(),cuentas[1].getNumeroCuenta());
         }
 
         while(menu!=CERRAR_SESION)
