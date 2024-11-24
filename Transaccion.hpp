@@ -129,11 +129,13 @@ public:
 }
 
 static bool depositar(Cuenta* cuentaReceptor, double monto) {
-    if (!cuentaReceptor) {
+    if (!cuentaReceptor->getNumeroCuenta()) {
         setbkcolor(COLOR(0xf9, 0xfa, 0xfb));
         settextstyle(8, 0, 1);
-        outtextxy(376, 644, (char*)"Error: La cuenta no está seleccionada.");
+        outtextxy(376, 644, (char*)"Error: La cuenta no esta seleccionada.");
         delay(1000);
+        setfillstyle(SOLID_FILL, COLOR(0xf9, 0xfa, 0xfb));
+        bar(362,632,800,660);
         return false;
     }
 
@@ -180,6 +182,8 @@ static bool retirar(Cuenta* cuentaOrigen, double monto) {
         settextstyle(8, 0, 1);
         outtextxy(376, 644, (char*)"Error: Fondos insuficientes.");
         delay(1000);
+        setfillstyle(SOLID_FILL, COLOR(0xf9, 0xfa, 0xfb));
+        bar(362,632,730,660);
         return false;
     }
 

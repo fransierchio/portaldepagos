@@ -297,5 +297,146 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
     archivo.close();
 }
 
+    static bool existeNumeroCuenta(int numeroCuenta) {
+        ifstream archivo("cuentas.txt");
+        if (!archivo.is_open()) return false;
+
+        string linea;
+        while (getline(archivo, linea)) {
+            int numCuenta = stoi(linea.substr(0, linea.find(';')));
+            if (numCuenta == numeroCuenta) {
+                archivo.close();
+                return true;
+            }
+        }
+        archivo.close();
+        return false;
+    }
+
+    static bool existeTarjeta(const string &tarjeta) {
+        ifstream archivo("cuentas.txt");
+        if (!archivo.is_open()) return false;
+
+        string linea;
+        while (getline(archivo, linea)) {
+            size_t pos = linea.rfind(';');
+            string tarjetaGuardada = linea.substr(pos + 1);
+            if (tarjetaGuardada == tarjeta) {
+                archivo.close();
+                return true;
+            }
+        }
+        archivo.close();
+        return false;
+    }
+
+    static void mostrarTodasLasCuentas() {
+        const int maxCuentas = 100;
+        Cuenta cuentas[maxCuentas];
+
+        ifstream archivo("cuentas.txt");
+        if (!archivo.is_open()) {
+            cout << "No se pudo abrir el archivo de cuentas." << endl;
+            return;
+        }
+
+        string linea, tarjeta;
+        int numCuenta, codigo;
+        string descripcion;
+        double saldo;
+        int index = 0;
+
+        while (getline(archivo, linea) && index < maxCuentas) {
+            int pos1 = linea.find(';');
+            int pos2 = linea.find(';', pos1 + 1);
+            int pos3 = linea.find(';', pos2 + 1);
+            int pos4 = linea.find(';', pos3 + 1);
+
+            numCuenta = stoi(linea.substr(0, pos1)); 
+            descripcion = linea.substr(pos1 + 1, pos2 - pos1 - 1); 
+            saldo = stod(linea.substr(pos2 + 1, pos3 - pos2 - 1)); 
+            codigo = stoi(linea.substr(pos3 + 1, pos4 - pos3 - 1)); 
+            tarjeta = linea.substr(pos4 + 1); 
+
+            cuentas[index] = Cuenta(numCuenta, descripcion, saldo, codigo, tarjeta);
+            index++;
+        }
+        archivo.close();
+
+        int startX = 300;
+        int startY = 100;
+        int offsetX = 100;
+        int offsetY = 50;
+        int limiteColumnas = 15;
+
+        int x = startX;
+        int y = startY;
+        int cuentaMostrada = 0;
+
+        for (int i = 0; i < index; ++i) {
+            char strCuenta[50];
+            itoa(cuentas[i].getNumeroCuenta(), strCuenta, 10);
+
+            setbkcolor(WHITE);
+            setcolor(BLACK);
+            settextstyle(8, 0, 2);
+            outtextxy(x, y, strCuenta);
+
+            cuentaMostrada++;
+            if (cuentaMostrada % limiteColumnas == 0) {
+                x = startX;
+                y += offsetY;
+            } else {
+                x += offsetX;
+            }
+        }
+}
+
+    static string generarTarjeta() {
+        string tarjeta;
+        do {
+            tarjeta = "4850 4600 ";
+            for (int i = 0; i < 2; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    tarjeta += to_string(rand() % 10);
+                }
+                if (i == 0) tarjeta += " ";
+            }
+        } while (existeTarjeta(tarjeta));
+        return tarjeta;
+    }
+
+    static int generarNumeroCuenta() {
+        int numeroCuenta;
+        do {
+            numeroCuenta = 100000 + rand() % 900000;  // Generar número de 6 dígitos
+        } while (existeNumeroCuenta(numeroCuenta));
+        return numeroCuenta;
+    }
+
+    static void crearCuentas(int codigoCliente) {
+        ofstream archivo("cuentas.txt", ios::app);
+        if (!archivo.is_open()) {
+            cerr << "No se pudo abrir el archivo cuentas.txt" << endl;
+            return;
+        }
+
+        // Crear cuenta corriente
+        int numeroCuentaCorriente = generarNumeroCuenta();
+        string tarjetaCorriente = generarTarjeta();
+        archivo << numeroCuentaCorriente << ";Cuenta corriente;0.00;" << codigoCliente << ";" << tarjetaCorriente << "\n";
+
+        // Crear cuenta de ahorro
+        int numeroCuentaAhorro = generarNumeroCuenta();
+        string tarjetaAhorro = generarTarjeta();
+        archivo << numeroCuentaAhorro << ";Cuenta de ahorros;0.00;" << codigoCliente << ";" << tarjetaAhorro << "\n";
+
+        archivo.close();
+        cout << "Cuentas creadas para el cliente " << codigoCliente << ":\n";
+        cout << "  - Corriente: " << numeroCuentaCorriente << " (Tarjeta: " << tarjetaCorriente << ")\n";
+        cout << "  - Ahorros: " << numeroCuentaAhorro << " (Tarjeta: " << tarjetaAhorro << ")\n";
+    }
+
+
 
 };
