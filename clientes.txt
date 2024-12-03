@@ -3,3 +3,5 @@
 3455;rocky balboa;1960/02/20;rocky@gmail.com;41223234212;3455.jpg
 1061;peter griffin;1980/12/12;peter@gmail.com;041486435373;1061.jpg
 4359;Como estan muchachos;2000/05/20;yolosveo_muybien@gmail.com;041492832312;4359.jpg
+3654;pini;2003/12/12;pini@gmail.com;0431232123;3654.jpg
+4179;pedro;2003/12/20;123@gmmail.com;202321323123;4179.jpg

@@ -143,7 +143,6 @@ static bool actualizarUsuario(int codigo, const string &nuevoUsuario, const stri
         bloqueo = linea.substr(pos3 + 1) == "1";
 
         if (codigoFile == codigo) {
-             cout << "Usuario encontrado: " << usuarioFile << endl;
             usuarioFile = nuevoUsuario;  // Cambiar usuario
             claveFile = nuevaClave;      // Cambiar clave
             bloqueo=bloqueoCta;
@@ -230,9 +229,9 @@ static int generarCodigo() {
         bool existe;
         do {
             existe = false;
-            codigo = rand() % 9000 + 1000; // Genera un número entre 1000 y 9999
+            codigo = rand() % 9000 + 1000; // Genera un numero entre 1000 y 9999
 
-            // Verificar si el código ya existe en el archivo
+            // Verificar si el codigo ya existe en el archivo
             ifstream archivo("usuario.txt");
             int codigoArchivo;
             string linea;
@@ -285,12 +284,12 @@ static bool existeCodigo(int codigo) {
 
         if (codigoCliente == codigo) {
             archivo.close();
-            return true;  // El código existe
+            return true;  // El codigo existe
         }
     }
 
     archivo.close();
-    return false;  // El código no existe
+    return false;  // El codigo no existe
 }
 
  static bool agregarNotificacion(int codigoUsuario) {
@@ -306,7 +305,6 @@ static bool existeCodigo(int codigo) {
         }
         archivo << codigoUsuario << ";pendiente\n"; 
         archivo.close();
-        cout << "Notificación agregada con éxito para el usuario " << codigoUsuario << endl;
         return true;
     }
 

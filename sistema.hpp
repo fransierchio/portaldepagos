@@ -219,7 +219,6 @@ void manejarTicketUI() {
     while (true) {
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
-            cout << "X: " << x << " Y: " << y << endl;
             limpiarBufferTeclado();
         }
 
@@ -278,7 +277,6 @@ bool manejarClickSolicitudes()
     while (true) {
         if (ismouseclick(WM_LBUTTONDOWN)) {
             getmouseclick(WM_LBUTTONDOWN, x, y);
-            cout << "X: " << x << " Y: " << y << endl;
             limpiarBufferTeclado();
         
 
@@ -324,7 +322,6 @@ bool manejarClickSolicitudes()
         while (true) {
             if (ismouseclick(WM_LBUTTONDOWN)) {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X: "<<x<<" Y: "<<y<<endl;
                 limpiarBufferTeclado();
             }
 
@@ -392,7 +389,6 @@ bool manejarClickSolicitudes()
             if (ismouseclick(WM_LBUTTONDOWN)) 
             {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X="<<x<<" Y="<<y;
             }
         } else 
         {
@@ -414,7 +410,6 @@ bool manejarClickSolicitudes()
             if (ismouseclick(WM_LBUTTONDOWN)) 
             {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X="<<x<<" Y="<<y;
             }
 
         }
@@ -572,7 +567,6 @@ bool manejarClickSolicitudes()
             {
                 limpiarBufferTeclado();
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X="<<x<<" Y="<<y;
                 
             
                 // depostitar corriente
@@ -671,7 +665,6 @@ bool manejarClickSolicitudes()
             {
                 limpiarBufferTeclado();
                 getmouseclick(WM_LBUTTONDOWN, x, y);
-                cout<<"X="<<x<<" Y="<<y;
                 
             
                 // Retirar corriente
@@ -789,7 +782,6 @@ bool manejarClickPerfil(int codigo)
             {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
                 limpiarBufferTeclado();
-                cout<<"X="<<x<<" Y="<<y;
                 
 
             //Nombre
@@ -872,9 +864,6 @@ bool manejarClickPerfil(int codigo)
                     Cliente::actualizarCliente(codigo,Nombre,correo,Numero,"");
                     menu=TABLERO;
                     return true;
-                } else 
-                {
-                    cout<<"Campos invalidos";
                 }
             }
 
@@ -918,7 +907,6 @@ bool manejarClickCrearUser(int codigo)
             {
                 getmouseclick(WM_LBUTTONDOWN, x, y);
                 limpiarBufferTeclado();
-                cout<<"X="<<x<<" Y="<<y;
                 
 
             //Nombre
@@ -1013,10 +1001,7 @@ bool manejarClickCrearUser(int codigo)
                     Cuenta::crearCuentas(codigoCte);
                     menu=PANEL;
                     return true;
-                } else 
-                {
-                    cout<<"Campos invalidos";
-                }
+                } 
             }
 
 
@@ -1055,7 +1040,7 @@ bool manejarClickModificar(int codigo)
             getmouseclick(WM_LBUTTONDOWN, x, y);
             limpiarBufferTeclado();
 
-            // Campo para ingresar el código
+            // Campo para ingresar el codigo
             if (clicEnRectangulo(565, 81, 1135, 132, x, y)) 
             {
                 escribirEnCampo(565, 81, 1135, 132, codigoIngresado, 10, codigoIndex, 0);
@@ -1080,7 +1065,6 @@ bool manejarClickModificar(int codigo)
 
                         bloqueoChar[0] = (bloqueo ? '1' : '0');
                         bloqueoChar[1] = '\0';
-                        cout << "Codigo válido, datos cargados." << endl;
                     } 
                 } 
                 else 
@@ -1104,7 +1088,6 @@ bool manejarClickModificar(int codigo)
         {
             getmouseclick(WM_LBUTTONDOWN, x, y);
             limpiarBufferTeclado();
-            cout << "X=" << x << " Y=" << y;
 
             // Nombre
             if(clicEnRectangulo(363, 235,948, 285, x, y))
@@ -1143,7 +1126,7 @@ bool manejarClickModificar(int codigo)
             }
             }
 
-            // Número
+            // Numero
             if(clicEnRectangulo(360, 514,948, 575, x, y))
             {
                 escribirEnCampo(360, 514,948, 575, Numero, 16, numeroIndex, 0);
@@ -1213,10 +1196,6 @@ bool manejarClickModificar(int codigo)
                     menu = TABLERO;
                     return true;
                 } 
-                else 
-                {
-                    cout << "Campos inválidos";
-                }
             }
 
             if(clicEnRectangulo(0,0,290,750,x,y)){ return 0; }
@@ -1356,7 +1335,7 @@ public:
         contrasena[0] = '\0';
     }
 
-    // Método para iniciar el sistema
+    // Metodo para iniciar el sistema
  void iniciarSistema() {
         int gd = DETECT, gm;
         initgraph(&gd, &gm, (char*)"");

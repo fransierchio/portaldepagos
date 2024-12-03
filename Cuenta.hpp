@@ -247,10 +247,10 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
                 if (!tarjeta.empty()) {
                     strcpy(strTarjeta, tarjeta.c_str());
                 } else {
-                    strcpy(strTarjeta, ""); // Si no hay tarjeta, vacío
+                    strcpy(strTarjeta, ""); // Si no hay tarjeta, vacio
                 }
 
-                // Dibujar transacción con coordenadas
+                // Dibujar transaccion con coordenadas
                 setbkcolor(WHITE);
                 setcolor(BLACK);
                 settextstyle(8, 0, 1);
@@ -258,7 +258,7 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
                 // Mostrar ID
                 outtextxy(x + 87, y, strID);
 
-                // Mostrar descripción
+                // Mostrar descripcion
                 if(descripcion=="Transferencia")
                 {
                     readimagefile("Tranferencias.jpg", 360, 430+yimg, 420, 470+yimg);
@@ -286,7 +286,7 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
                     outtextxy(x, y, strTarjeta);
                 }
 
-                // Incrementar Y para la siguiente transacción
+                // Incrementar Y para la siguiente transaccion
                 y += offsetY;
                 yimg += offsetY;
             }
@@ -367,7 +367,7 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
         int startY = 100;
         int offsetX = 100;
         int offsetY = 50;
-        int limiteColumnas = 15;
+        int limiteColumnas = 12;
 
         int x = startX;
         int y = startY;
@@ -409,7 +409,7 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
     static int generarNumeroCuenta() {
         int numeroCuenta;
         do {
-            numeroCuenta = 100000 + rand() % 900000;  // Generar número de 6 dígitos
+            numeroCuenta = 100000 + rand() % 900000;  // Generar numero de 6 digitos
         } while (existeNumeroCuenta(numeroCuenta));
         return numeroCuenta;
     }
@@ -432,9 +432,6 @@ void mostrarTransacciones(int cuenta1, int cuenta2) {
         archivo << numeroCuentaAhorro << ";Cuenta de ahorros;0.00;" << codigoCliente << ";" << tarjetaAhorro << "\n";
 
         archivo.close();
-        cout << "Cuentas creadas para el cliente " << codigoCliente << ":\n";
-        cout << "  - Corriente: " << numeroCuentaCorriente << " (Tarjeta: " << tarjetaCorriente << ")\n";
-        cout << "  - Ahorros: " << numeroCuentaAhorro << " (Tarjeta: " << tarjetaAhorro << ")\n";
     }
 
 
